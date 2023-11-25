@@ -35,8 +35,56 @@ public class Lab7P1_AlejandroSussman {
                     System.out.println("Tablero Actual");
                     char[][] tablero = generarTablero();
                     print(tablero);
-                    System.out.println("Es el turno de: ");
-                    boolean 
+                    int turno = 1; //1: Jugador, 2: PC
+                    int jugadas = 0; // Maximo 9 jugadas
+                    boolean hay_ganador = false;
+                    while (jugadas <= 9 && hay_ganador != true) {
+
+                        if (turno == 1) {
+                            System.out.println("Es el turno de X");
+                            boolean esValido = false;
+                            while (esValido == false) {
+                                System.out.println("Ingrese la fila(0,1,2): ");
+                                int fila = sc.nextInt();
+                                System.out.println("Ingrese la columna(0,1,2): ");
+                                int colm = sc.nextInt();
+
+                                esValido = verificarPosicionValida(tablero, fila, colm);
+                                if (esValido == false) {
+                                    System.out.println("La posicion ya fue juagada, seleccione otra: ");
+                                } else {
+                                    System.out.println("El usuario ha elegido la posicion (" + fila + ", " + colm + ")");
+                                    tablero[fila][colm] = 'X';
+                                }
+                            }
+                        } else {
+                            System.out.println("Es el turno de 0");
+                            boolean esValido = false;
+                            while (esValido == false) {
+                                int fila = rand.nextInt(3);
+                                int colm = rand.nextInt(3);
+                                esValido = verificarPosicionValida(tablero, fila, colm);
+                                if (esValido == true) {
+                                    System.out.println("La maquina ha elegido la posicion (" + fila + ", " + colm + ")");
+                                    tablero[fila][colm] = '0';
+                                }
+                            }
+                        }
+
+                        print(tablero);
+
+                        hay_ganador = verificarVictoria(tablero, 'X');
+                        if (hay_ganador == false) {
+                            hay_ganador = verificarVictoria(tablero, '0');
+                        }
+                        jugadas++;
+                        if (turno == 1) {
+                            turno = 2;
+                        } else {
+                            turno = 1;
+                        }
+                    }
+
                     break;
                 case 2:
                     System.out.println("---Bienvenido a Punto de Silla---");
@@ -144,13 +192,46 @@ public class Lab7P1_AlejandroSussman {
         }
     }
 
-    public static boolean verificarVictoria(char[][] matrix) {
+    public static boolean verificarVictoria(char[][] matrix, char jugador) {
         boolean gane = false;
+        int cols = matrix[0].length - 1;
+
+        int contf = 0;
+        int contc = 0;
+        int diag1 = 0;
+        int diag2 = 0;
+
         for (int i = 0; i < matrix.length; i++) {
-            gane = true;
+            contf = 0;
+            contc = 0;
+            diag1 = 0;
+            diag2 = 0;
+            // Filas y Columnas
             for (int j = 0; j < matrix[i].length; j++) {
-                
+                if (matrix[i][j] == jugador) {
+                    contf++;
+                }
+                if (matrix[j][i] == jugador) {
+                    contc++;
+                }                
             }
+            //Diagonales
+            for(int j =0 ; j <= cols; j++)
+            {
+                if (matrix[j][j] == jugador) {
+                    diag1++;
+                }
+                if (matrix[j][cols - j] == jugador) {
+                    diag2++;
+                }
+            }
+            
+            if (contf == 3 || contc == 3 || diag1 == 3 || diag2 == 3) {
+                gane = true;
+            }
+        }
+        if (gane) {
+            System.out.println("El ganador es: " + jugador);
         }
         return gane;
     }
